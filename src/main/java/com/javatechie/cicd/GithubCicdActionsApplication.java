@@ -13,7 +13,7 @@ public class GithubCicdActionsApplication {
 	public String welcome() {
 		return "Welcome to GitHub Actions CI/CD Pipeline";
 	}
-
+	// Archivo de prueba
 	public static void main(String[] args) {
 		SpringApplication.run(GithubCicdActionsApplication.class, args);
 	}
