@@ -14,6 +14,7 @@ public class GithubCicdActionsApplication {
 		return "Welcome to GitHub Actions CI/CD Pipeline";
 	}
 	// Archivo de prueba
+	//Hacemos otro commit mas
 	public static void main(String[] args) {
 		SpringApplication.run(GithubCicdActionsApplication.class, args);
 	}
