@@ -1,4 +1,4 @@
-name: SSH Debug
+name: SSH Debug (Base64)
 
 on:
   workflow_dispatch:
@@ -8,22 +8,22 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Mostrar fingerprint de la clave privada usada
+      - name: Decodificar clave privada desde secreto base64
         run: |
-          echo "$DROPLET_SSH_KEY" > id_rsa
+          echo "$DROPLET_SSH_KEY_B64" | base64 -d > id_rsa
           chmod 600 id_rsa
-          echo "📎 Fingerprint de la clave cargada en secreto:"
+          echo "📎 Fingerprint de la clave cargada en GitHub:"
           ssh-keygen -lf id_rsa
         env:
-          DROPLET_SSH_KEY: ${{ secrets.DROPLET_SSH_KEY }}
+          DROPLET_SSH_KEY_B64: ${{ secrets.DROPLET_SSH_KEY_B64 }}
 
-      - name: Probar conexión SSH básica
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.DROPLET_IP }}
-          username: ${{ secrets.DROPLET_USER }}
-          key: ${{ secrets.DROPLET_SSH_KEY }}
-          script: |
-            echo "✅ Conexión SSH desde Actions funcionando correctamente"
+      - name: Conexión SSH directa (sin appleboy)
+        run: |
+          echo "⏳ Intentando conexión manual..."
+          ssh -o StrictHostKeyChecking=no -i id_rsa root@${{ secrets.DROPLET_IP }} "
+            echo '✅ Conexión directa exitosa desde GitHub Actions'
             whoami
             uptime
+          "
+        env:
+          DROPLET_SSH_KEY_B64: ${{ secrets.DROPLET_SSH_KEY_B64 }}
