@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class GithubCicdActionsApplication {
 
-	@GetMapping("/welcome")
+	@GetMapping("/bienvenida")
 	public String welcome() {
-		return "Welcome to GitHub Actions CI/CD Pipeline";
+		return "Qué notable, se desplegó haciendo git commit y git push";
 	}
 	// Archivo de prueba
 	//Hacemos otro commit mas
