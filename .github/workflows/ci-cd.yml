@@ -40,30 +40,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Mostrar fingerprint de la clave privada cargada como secreto
+      - name: Decodificar clave privada
         run: |
-          echo "$DROPLET_SSH_KEY" > id_rsa
+          echo "$DROPLET_SSH_KEY_B64" | base64 -d > id_rsa
           chmod 600 id_rsa
-          ssh-keygen -lf id_rsa
         env:
-          DROPLET_SSH_KEY: ${{ secrets.DROPLET_SSH_KEY }}
+          DROPLET_SSH_KEY_B64: ${{ secrets.DROPLET_SSH_KEY_B64 }}
 
-      - name: Probar conexión SSH desde Actions
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.DROPLET_IP }}
-          username: ${{ secrets.DROPLET_USER }}
-          key: ${{ secrets.DROPLET_SSH_KEY }}
-          script: echo "✅ Conexión SSH exitosa desde GitHub Actions"
-
-      - name: Deploy en el Droplet
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.DROPLET_IP }}
-          username: ${{ secrets.DROPLET_USER }}
-          key: ${{ secrets.DROPLET_SSH_KEY }}
-          script: |
+      - name: Conexión y despliegue en el Droplet
+        run: |
+          echo "🚀 Conectando al Droplet..."
+          ssh -o StrictHostKeyChecking=no -i id_rsa root@${{ secrets.DROPLET_IP }} << 'EOF'
+            echo "✅ Conexión establecida. Iniciando despliegue..."
             docker stop spring-prueba || true
             docker rm spring-prueba || true
             docker pull nheinroth27/spring-boot-app-prueba:latest
             docker run -d --name spring-prueba -p 8080:8080 nheinroth27/spring-boot-app-prueba:latest
+            echo "🚀 Despliegue finalizado exitosamente"
+          EOF
+        env:
+          DROPLET_IP: ${{ secrets.DROPLET_IP }}
